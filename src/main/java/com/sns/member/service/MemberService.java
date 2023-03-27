@@ -7,7 +7,9 @@ import com.sns.member.exception.MemberJoinException;
 import com.sns.member.exception.MemberLoginException;
 import com.sns.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -16,14 +18,18 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder encoder;
+    @Transactional
     public MemberDto join(MemberDto memberDto) {
 
         Optional<Member> findMember = memberRepository.findByMemberName(memberDto.getMemberName());
         if (findMember.isPresent()) {
             throw new MemberJoinException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated",memberDto.getMemberName()));
         }
+        Member member = memberDto.toEntity();
 
-        Member member = memberRepository.save(memberDto.toEntity());
+        String encodedPassword = encoder.encode(memberDto.getPassword());
+        member.encodingPassword(encodedPassword);
 
         return memberDto.from(member);
     }

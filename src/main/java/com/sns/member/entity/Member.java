@@ -10,8 +10,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 @Table(name = "member")
-@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id=?")
-@Where(clause = "deleted_at is NULL")
+//@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id=?")
+//@Where(clause = "deleted_at is NULL")
 @Getter
 @NoArgsConstructor
 @Entity
@@ -46,6 +46,9 @@ public class Member {
         this.password = password;
     }
     public static Member of(String memberName, String password) {
-        return new Member(memberName,password);
+        return new Member(memberName, password);
+    }
+    public void encodingPassword(String password) {
+        this.password = password;
     }
 }
