@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/members")
 public class MemberController {
 
     private final MemberService memberService;
     @PostMapping("/join")
     public Response<MemberJoinResponseDto> join(@RequestBody MemberJoinRequestDto requestDto) {
         MemberDto memberDto = MemberDto.from(requestDto);
-        memberService.join(memberDto);
+        MemberDto joinMember = memberService.join(memberDto);
 
-        return Response.success(MemberJoinResponseDto.from(memberDto));
+        return Response.success(MemberJoinResponseDto.from(joinMember));
     }
 }
