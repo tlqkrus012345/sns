@@ -4,7 +4,9 @@ import com.sns.member.dto.MemberDto;
 import com.sns.member.entity.Member;
 import com.sns.member.entity.MemberRole;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class MemberJoinResponseDto {
 
