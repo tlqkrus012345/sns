@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -32,7 +33,8 @@ public class MemberServiceTest {
     private MemberService memberService;
     @Mock
     private MemberRepository memberRepository;
-
+    @Mock
+    private BCryptPasswordEncoder encoder;
     @BeforeEach
     void setUp() {
         memberDto = MemberDto.from(MemberJoinRequestDto.builder()
@@ -48,9 +50,10 @@ public class MemberServiceTest {
         String password = "password";
         MemberJoinRequestDto memberJoinRequestDto = MemberJoinRequestDto.builder().memberName(memberName).password(password).build();
         MemberDto memberDto = MemberDto.from(memberJoinRequestDto);
+        memberDto.toEntity(memberDto, encoder);
 
         when(memberRepository.findByMemberName(memberDto.getMemberName())).thenReturn(Optional.empty());
-        when(memberRepository.save(any())).thenReturn(Optional.of(Member.class));
+        when(memberRepository.save(any())).thenReturn((Member.class));
 
         Assertions.assertDoesNotThrow(() -> memberService.join(memberDto));
     }
@@ -64,6 +67,7 @@ public class MemberServiceTest {
 
 
         when(memberRepository.findByMemberName(newMemberDto.getMemberName())).thenReturn(Optional.of(member));
+        when(encoder.encode(memberDto.getPassword())).thenReturn("encrypt password");
         when(memberRepository.save(any())).thenReturn(mock(Member.class));
 
         Assertions.assertThrows(MemberJoinException.class,() -> memberService.join(newMemberDto));

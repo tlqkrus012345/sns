@@ -1,5 +1,6 @@
 package com.sns.member.exception;
 
+import com.sns.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

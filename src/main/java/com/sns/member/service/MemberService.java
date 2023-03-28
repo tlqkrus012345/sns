@@ -2,11 +2,13 @@ package com.sns.member.service;
 
 import com.sns.member.dto.MemberDto;
 import com.sns.member.entity.Member;
-import com.sns.member.exception.ErrorCode;
+import com.sns.common.exception.ErrorCode;
 import com.sns.member.exception.MemberJoinException;
 import com.sns.member.exception.MemberLoginException;
 import com.sns.member.repository.MemberRepository;
+import com.sns.common.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder;
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${jwt.token.expired-time-ms}")
+    private Long expiredTimeMs;
+
     @Transactional
     public MemberDto join(MemberDto memberDto) {
 
@@ -31,7 +39,7 @@ public class MemberService {
         String encodedPassword = encoder.encode(memberDto.getPassword());
         member.encodingPassword(encodedPassword);
 
-        return memberDto.from(member);
+        return memberDto.from(memberRepository.save(member));
     }
     // 유저를 파악하기 위해 암호화된 문자열을 통해서 인증한다.
     public String login(MemberDto memberDto) {
@@ -39,10 +47,16 @@ public class MemberService {
         Member member = memberRepository.findByMemberName(memberDto.getMemberName()).orElseThrow(
                 () -> new MemberLoginException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not found", memberDto.getMemberName())));
 
-        if (!member.getPassword().equals(memberDto.getPassword())) {
+        if (!encoder.matches(memberDto.getPassword(), member.getPassword())) {
             throw new MemberLoginException(ErrorCode.WRONG_PASSWORD, String.format("%s is wrong", memberDto.getPassword()));
         }
 
-        return "";
+        String token = JwtTokenUtils.generateToken(memberDto.getMemberName(), secretKey, expiredTimeMs);
+        return token;
+    }
+    public MemberDto findMemberByMemberName(String memberName) {
+        return memberRepository.findByMemberName(memberName).map(MemberDto :: fromEntity).orElseThrow(
+                () -> new MemberJoinException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not found",memberName))
+        );
     }
 }

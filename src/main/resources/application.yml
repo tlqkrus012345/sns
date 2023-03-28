@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -14,6 +14,12 @@ spring:
     url: jdbc:mysql://localhost:3306/sns-service
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+
+jwt:
+  secret:
+  key: ${JWT_SECRET_KEY}
+  token:
+    expired-time-ms: 2592000000
 
 logging:
   level:
