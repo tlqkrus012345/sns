@@ -1,7 +1,11 @@
 package com.sns.post.service;
 
 import com.sns.common.exception.ErrorCode;
+import com.sns.member.entity.Alarm;
+import com.sns.member.entity.AlarmArguments;
+import com.sns.member.entity.AlarmType;
 import com.sns.member.entity.Member;
+import com.sns.member.repository.AlarmRepository;
 import com.sns.member.repository.MemberRepository;
 import com.sns.post.dto.PostDto;
 import com.sns.post.entity.Like;
@@ -25,6 +29,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
+    private final AlarmRepository alarmRepository;
     @Transactional
     public void create(String title, String context, String memberName) {
         Member member = memberRepository.findByMemberName(memberName).orElseThrow(
@@ -78,6 +83,9 @@ public class PostService {
         }
 
         likeRepository.save(Like.of(member,post));
+
+        alarmRepository.save(Alarm.of(post.getMember(), AlarmType.NEW_LIKE_ON_POST, new AlarmArguments(member.getId(),post.getId())));
+
     }
     public Integer likeCount(Long postId) {
         Post post = existPost(postId);

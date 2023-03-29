@@ -1,9 +1,7 @@
 package com.sns.post.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sns.common.exception.ErrorCode;
-import com.sns.member.dto.request.MemberJoinRequestDto;
 import com.sns.post.dto.request.CommentRequestDto;
 import com.sns.post.dto.request.PostCreateRequestDto;
 import com.sns.post.dto.request.PostUpdateRequestDto;
@@ -176,4 +174,5 @@ public class PostControllerTest {
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
+
 }

@@ -30,6 +30,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	compileOnly "io.hypersistence:hypersistence-utils-hibernate-52:3.3.0"
 }
 
 tasks.named('test') {

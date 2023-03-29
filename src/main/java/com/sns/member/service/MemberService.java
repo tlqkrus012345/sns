@@ -1,14 +1,18 @@
 package com.sns.member.service;
 
+import com.sns.member.dto.AlarmDto;
 import com.sns.member.dto.MemberDto;
 import com.sns.member.entity.Member;
 import com.sns.common.exception.ErrorCode;
 import com.sns.member.exception.MemberJoinException;
 import com.sns.member.exception.MemberLoginException;
+import com.sns.member.repository.AlarmRepository;
 import com.sns.member.repository.MemberRepository;
 import com.sns.common.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final AlarmRepository alarmRepository;
     private final BCryptPasswordEncoder encoder;
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -58,5 +63,12 @@ public class MemberService {
         return memberRepository.findByMemberName(memberName).map(MemberDto :: fromEntity).orElseThrow(
                 () -> new MemberJoinException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not found",memberName))
         );
+    }
+    public Page<AlarmDto> alarmList(String memberName, Pageable pageable) {
+        Member member = memberRepository.findByMemberName(memberName).orElseThrow(
+                () -> new MemberJoinException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not found", memberName)));
+
+        return alarmRepository.findAllByMember(member, pageable).map(AlarmDto::from);
+
     }
 }
