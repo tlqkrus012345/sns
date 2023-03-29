@@ -132,4 +132,25 @@ public class PostControllerTest {
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @WithMockUser
+    @DisplayName("좋아요가 정상적으로 작동한다")
+    void like_post_success() throws Exception {
+
+        mockMvc.perform(post("/api/v1/post/1/like")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+    @Test
+    @WithAnonymousUser
+    @DisplayName("좋아요가 정상적으로 작동하지 않는다")
+    void like_post_fail() throws Exception {
+
+        mockMvc.perform(post("/api/v1/post/1/like")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
 }
