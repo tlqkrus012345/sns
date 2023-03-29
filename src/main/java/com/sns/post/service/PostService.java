@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,7 +35,7 @@ public class PostService {
     }
     @Transactional
     public PostDto update(String title, String context, Long postId, String memberName) {
-        Member member = findMember(memberName);
+        Member member = existMember(memberName);
 
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new PostException(ErrorCode.POST_NOT_FOUND, String.format("%s is not found", postId)));
@@ -50,9 +49,9 @@ public class PostService {
     }
     @Transactional
     public void delete(String memberName, Long postId) {
-        Member member = findMember(memberName);
+        Member member = existMember(memberName);
 
-        Post post = findPost(postId);
+        Post post = existPost(postId);
 
         if (post.getMember() != member) {
             throw new PostException(ErrorCode.INVALID_PERMISSION, String.format("%s is not %s", memberName,postId));
@@ -64,14 +63,14 @@ public class PostService {
         return postRepository.findAll(pageable).map(PostDto::fromEntity);
     }
     public Page<PostDto> myList(String memberName, Pageable pageable) {
-        Member member = findMember(memberName);
+        Member member = existMember(memberName);
 
         return postRepository.findAllByMember(member, pageable).map(PostDto::fromEntity);
     }
     @Transactional
     public void like(Long postId, String memberName) {
-        Member member = findMember(memberName);
-        Post post = findPost(postId);
+        Member member = existMember(memberName);
+        Post post = existPost(postId);
 
         Optional<Like> memberAndPost = likeRepository.findByMemberAndPost(member, post);
         if (memberAndPost.isPresent()) {
@@ -81,15 +80,15 @@ public class PostService {
         likeRepository.save(Like.of(member,post));
     }
     public Integer likeCount(Long postId) {
-        Post post = findPost(postId);
+        Post post = existPost(postId);
 
         return likeRepository.countByPost(post);
     }
-    private Member findMember(String memberName) {
+    Member existMember(String memberName) {
         return memberRepository.findByMemberName(memberName).orElseThrow(
                 () -> new PostException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s is not found", memberName)));
     }
-    private Post findPost(Long postId) {
+    Post existPost(Long postId) {
         return postRepository.findById(postId).orElseThrow(
                 () -> new PostException(ErrorCode.POST_NOT_FOUND, String.format("%s is not found", postId)));
     }

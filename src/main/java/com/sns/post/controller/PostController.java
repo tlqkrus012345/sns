@@ -2,11 +2,14 @@ package com.sns.post.controller;
 
 import com.sns.member.dto.response.Response;
 import com.sns.post.dto.PostDto;
+import com.sns.post.dto.request.CommentRequestDto;
 import com.sns.post.dto.request.PostCreateRequestDto;
 import com.sns.post.dto.request.PostUpdateRequestDto;
+import com.sns.post.dto.response.CommentResponseDto;
 import com.sns.post.dto.response.PostListResponseDto;
 import com.sns.post.dto.response.PostResponseDto;
 import com.sns.post.dto.response.PostUpdateResponseDto;
+import com.sns.post.service.CommentService;
 import com.sns.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final CommentService commentService;
     @PostMapping("/create")
     public Response<Void> create(@RequestBody PostCreateRequestDto requestDto, Authentication authentication) {
         postService.create(requestDto.getTitle(),requestDto.getContext(), authentication.getName());
@@ -55,5 +59,15 @@ public class PostController {
     @GetMapping("/{postId}/like")
     public Response<Integer> likeCount(@PathVariable Long postId, Authentication authentication) {
         return Response.success(postService.likeCount(postId));
+    }
+
+    @PostMapping("/{postId}/comment")
+    public Response<Void> comment(@PathVariable Long postId, @RequestBody CommentRequestDto requestDto, Authentication authentication) {
+        commentService.comment(postId, requestDto.getComment(), authentication.getName());
+        return Response.success();
+    }
+    @GetMapping("/{postId}/comment")
+    public Response<Page<CommentResponseDto>> comment(@PathVariable Long postId, Pageable pageable) {
+        return Response.success(commentService.list(postId,pageable).map(CommentResponseDto::from));
     }
 }

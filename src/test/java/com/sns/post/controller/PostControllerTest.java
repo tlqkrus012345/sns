@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sns.common.exception.ErrorCode;
 import com.sns.member.dto.request.MemberJoinRequestDto;
+import com.sns.post.dto.request.CommentRequestDto;
 import com.sns.post.dto.request.PostCreateRequestDto;
 import com.sns.post.dto.request.PostUpdateRequestDto;
 import com.sns.post.exception.PostException;
@@ -150,6 +151,28 @@ public class PostControllerTest {
 
         mockMvc.perform(post("/api/v1/post/1/like")
                         .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @WithMockUser
+    @DisplayName("댓글이 정상적으로 작동한다")
+    void comment_post_success() throws Exception {
+
+        mockMvc.perform(post("/api/v1/post/1/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new CommentRequestDto("comment")))
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+    @Test
+    @WithAnonymousUser
+    @DisplayName("댓글이 정상적으로 작동하지 않는다")
+    void comment_post_fail() throws Exception {
+
+        mockMvc.perform(post("/api/v1/post/1/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new CommentRequestDto("comment")))
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
