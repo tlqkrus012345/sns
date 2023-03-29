@@ -2,6 +2,9 @@ package com.sns.post.dto;
 
 import com.sns.member.dto.MemberDto;
 import com.sns.post.dto.request.PostCreateRequestDto;
+import com.sns.post.dto.response.PostResponseDto;
+import com.sns.post.dto.response.PostUpdateResponseDto;
+import com.sns.post.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +25,22 @@ public class PostDto {
         return new PostDto(
                 requestDto.getTitle(),
                 requestDto.getContext()
+        );
+    }
+    public static PostDto fromEntity(Post post) {
+        return new PostDto(
+                post.getId(),
+                MemberDto.from(post.getMember()),
+                post.getTitle(),
+                post.getContext()
+        );
+    }
+    public static PostResponseDto from(PostDto postDto) {
+        return new PostResponseDto(
+                postDto.getId(),
+                postDto.getTitle(),
+                postDto.getContext(),
+                postDto.getMemberDto()
         );
     }
 }

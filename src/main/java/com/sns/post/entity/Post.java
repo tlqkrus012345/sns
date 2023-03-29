@@ -33,4 +33,8 @@ public class Post extends BaseTimeEntity {
     public static Post of(String title, String context, Member member) {
         return new Post(title, context, member);
     }
+    public void updatePost(String title, String context) {
+        this.title = title;
+        this.context = context;
+    }
 }

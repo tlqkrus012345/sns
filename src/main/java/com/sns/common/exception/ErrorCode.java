@@ -10,7 +10,8 @@ public enum ErrorCode {
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "Password Is Wrong"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "Member Not Found"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Interval Server Error"),
-
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
+    INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "User has invalid permission"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid");
     private HttpStatus status;
     private String message;
