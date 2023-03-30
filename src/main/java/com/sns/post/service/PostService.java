@@ -12,6 +12,7 @@ import com.sns.post.entity.Like;
 import com.sns.post.entity.Post;
 import com.sns.post.exception.LikeException;
 import com.sns.post.exception.PostException;
+import com.sns.post.repository.CommentRepository;
 import com.sns.post.repository.LikeRepository;
 import com.sns.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final AlarmRepository alarmRepository;
+    private final CommentRepository commentRepository;
     @Transactional
     public void create(String title, String context, String memberName) {
         Member member = memberRepository.findByMemberName(memberName).orElseThrow(
@@ -61,7 +63,8 @@ public class PostService {
         if (post.getMember() != member) {
             throw new PostException(ErrorCode.INVALID_PERMISSION, String.format("%s is not %s", memberName,postId));
         }
-
+        likeRepository.deleteAllByPost(post);
+        commentRepository.deleteAllByPost(post);
         postRepository.delete(post);
     }
     public Page<PostDto> list(Pageable pageable) {
