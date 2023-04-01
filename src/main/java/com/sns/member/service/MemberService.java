@@ -7,6 +7,7 @@ import com.sns.common.exception.ErrorCode;
 import com.sns.member.exception.MemberJoinException;
 import com.sns.member.exception.MemberLoginException;
 import com.sns.member.repository.AlarmRepository;
+import com.sns.member.repository.MemberCacheRepository;
 import com.sns.member.repository.MemberRepository;
 import com.sns.common.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final AlarmRepository alarmRepository;
     private final BCryptPasswordEncoder encoder;
+    private final MemberCacheRepository memberCacheRepository;
     @Value("${jwt.secret-key}")
     private String secretKey;
 
@@ -49,10 +51,10 @@ public class MemberService {
     // 유저를 파악하기 위해 암호화된 문자열을 통해서 인증한다.
     public String login(MemberDto memberDto) {
 
-        Member member = memberRepository.findByMemberName(memberDto.getMemberName()).orElseThrow(
-                () -> new MemberLoginException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not found", memberDto.getMemberName())));
+        MemberDto findMemberDto = findMemberByMemberName(memberDto.getMemberName());
+        memberCacheRepository.setMemberDto(findMemberDto);
 
-        if (!encoder.matches(memberDto.getPassword(), member.getPassword())) {
+        if (!encoder.matches(memberDto.getPassword(), findMemberDto.getPassword())) {
             throw new MemberLoginException(ErrorCode.WRONG_PASSWORD, String.format("%s is wrong", memberDto.getPassword()));
         }
 
@@ -60,9 +62,10 @@ public class MemberService {
         return token;
     }
     public MemberDto findMemberByMemberName(String memberName) {
-        return memberRepository.findByMemberName(memberName).map(MemberDto :: fromEntity).orElseThrow(
+        return memberCacheRepository.getMemberDto(memberName).orElseGet(() ->
+            memberRepository.findByMemberName(memberName).map(MemberDto :: fromEntity).orElseThrow(
                 () -> new MemberJoinException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not found",memberName))
-        );
+         ));
     }
     public Page<AlarmDto> alarmList(String memberName, Pageable pageable) {
         Member member = memberRepository.findByMemberName(memberName).orElseThrow(

@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  sns-redis:
+    container_name: sns-redis
+    build:
+      dockerfile: Dockerfile
+      context: ./redis
+    image: tlqkrus012345/sns-redis
+    ports:
+      - "6379:6379"

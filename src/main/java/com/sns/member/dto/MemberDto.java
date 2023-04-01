@@ -7,7 +7,9 @@ import com.sns.member.dto.request.MemberLoginRequestDto;
 import com.sns.member.entity.Member;
 import com.sns.member.entity.MemberRole;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberDto implements UserDetails {
     private Long id;
@@ -68,6 +71,7 @@ public class MemberDto implements UserDetails {
         );
     }
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.getMemberRole().toString()));
     }
@@ -76,20 +80,24 @@ public class MemberDto implements UserDetails {
         return this.memberName;
     }
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return false;
     }
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return false;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return false;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return false;
     }
