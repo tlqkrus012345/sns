@@ -1,7 +1,6 @@
-package com.sns.member.entity;
-import com.sns.member.entity.AlarmArguments;
+package com.sns.member.entity.alarm;
 import com.sns.common.BaseTimeEntity;
-import com.sns.post.entity.Post;
+import com.sns.member.entity.Member;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
